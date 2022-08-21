@@ -1,4 +1,5 @@
 const Card = require("../models/cards");
+
 const DEFAULT_ERROR = 500;
 const NOT_FOUND_ERROR = 404;
 const BAD_REQUEST_ERROR = 400;
@@ -7,33 +8,41 @@ const getCards = async (req, res) => {
   try {
     const card = await Card.find({});
     res.status(200).send(card);
-  } catch (err) {
-    res.status(500).send({ message: "Ошибка на сервере" });
+  } catch (error) {
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
 };
 
+// eslint-disable-next-line consistent-return
 const createCard = async (req, res) => {
-  // const id = req.user._id;
-  // const { name, link } = req.body;
-  // try {
-  //   const card = await Card.create({ name, link, owner: id });
-  //   res.status(200).send(card);
-  // } catch (err) {
-  //   res.status(500).send({ message: "Ошибка на сервере" });
-  // }
+  const owner = req.user._id;
+  const { name, link } = req.body;
+  try {
+    const card = await Card.create({ name, link, owner });
+    res.status(200).send(card);
+  } catch (errors) {
+    if (errors.name.name === "ValidatorError") {
+      return res
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные карточки" });
+    }
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
+  }
 };
 
+// eslint-disable-next-line consistent-return
 const deleteCardById = async (req, res) => {
-  const { id } = req.params;
+  const { cardId } = req.params;
   try {
-    const card = await Card.findByIdAndDelete(id);
+    const card = await Card.findByIdAndDelete(cardId);
     res.status(200).send(card);
-  } catch (err) {
-    if (!id) {
-      res.status(400).send({ message: "Такой карточки нет" });
-      return;
+  } catch (errors) {
+    if (errors.name === "CastError") {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Такой карточки нет" });
     }
-    res.status(500).send({ message: "Ошибка на сервере" });
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
 };
 

@@ -8,7 +8,7 @@
     "start": "node --inspect app.js",
     "dev": "nodemon app.js",
     "debug": "nodemon --inspect app.js",
-    "lint": "npx eslint"
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",

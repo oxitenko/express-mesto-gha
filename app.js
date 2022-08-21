@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+
 const { PORT = 3000 } = process.env;
 const app = express();
 const { UserRoutes } = require("./routes/users");
@@ -25,8 +26,8 @@ async function main() {
     });
 
     await app.listen(PORT);
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
   }
 }
 

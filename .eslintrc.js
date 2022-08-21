@@ -12,6 +12,8 @@ module.exports = {
   },
   rules: {
     quotes: ["error", "double"],
-    "no-underscore-dangle": ["error", "allow"],
+    "no-underscore-dangle": ["error", { allow: ["true"] }],
+    // eslint-disable-next-line no-dupe-keys
+    "no-underscore-dangle": "off",
   },
 };
