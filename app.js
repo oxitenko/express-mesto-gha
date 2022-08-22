@@ -6,6 +6,8 @@ const app = express();
 const { UserRoutes } = require("./routes/users");
 const { CardRoutes } = require("./routes/cards");
 
+const NOT_FOUND_ERROR = 404;
+
 app.use((req, res, next) => {
   req.user = {
     _id: "63023f63b35df8b746b4b228",
@@ -18,7 +20,7 @@ app.use(UserRoutes);
 
 app.use(CardRoutes);
 
-async function main() {
+async function main(req, res) {
   try {
     await mongoose.connect("mongodb://localhost:27017/mestodb", {
       useNewUrlParser: true,
@@ -27,7 +29,7 @@ async function main() {
 
     await app.listen(PORT);
   } catch (error) {
-    console.log(error);
+    res.status(NOT_FOUND_ERROR).send({ message: "Страница не найдена" });
   }
 }
 

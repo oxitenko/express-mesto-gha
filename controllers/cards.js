@@ -35,12 +35,17 @@ const deleteCardById = async (req, res) => {
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndDelete(cardId);
+    if (!card) {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Такой карточки нет" });
+    }
     res.status(200).send(card);
   } catch (errors) {
     if (errors.name === "CastError") {
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "Такой карточки нет" });
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные запроса" });
     }
     res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
@@ -55,12 +60,17 @@ const likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true, runValidators: true }
     );
+    if (!card) {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Такой карточки нет" });
+    }
     res.status(200).send(card);
   } catch (errors) {
     if (errors.name === "CastError") {
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "Такой карточки нет" });
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные запроса" });
     }
     res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
@@ -75,12 +85,17 @@ const dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true, runValidators: true }
     );
+    if (!card) {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Такой карточки нет" });
+    }
     res.status(200).send(card);
   } catch (errors) {
     if (errors.name === "CastError") {
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "Такой карточки нет" });
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные запроса" });
     }
     res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
