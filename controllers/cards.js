@@ -46,8 +46,50 @@ const deleteCardById = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
+const likeCard = async (req, res) => {
+  const { cardId } = req.params;
+  try {
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true }
+    );
+    res.status(200).send(card);
+  } catch (errors) {
+    if (errors.name === "CastError") {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Такой карточки нет" });
+    }
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
+  }
+};
+
+// eslint-disable-next-line consistent-return
+const dislikeCard = async (req, res) => {
+  const { cardId } = req.params;
+  try {
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    );
+    res.status(200).send(card);
+  } catch (errors) {
+    if (errors.name === "CastError") {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Такой карточки нет" });
+    }
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
+  }
+};
+
 module.exports = {
   getCards,
   createCard,
   deleteCardById,
+  likeCard,
+  dislikeCard,
 };

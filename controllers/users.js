@@ -46,8 +46,58 @@ const createUser = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line consistent-return
+const updateUser = async (req, res) => {
+  const { name, about } = req.body;
+  const id = req.user._id;
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { name, about },
+      { new: true }
+    );
+    res.status(200).send(user);
+  } catch (errors) {
+    if (errors.name.name === "ValidatorError") {
+      return res
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные пользователя" });
+    }
+    if (errors.name === "CastError") {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Пользователь не найден" });
+    }
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
+  }
+};
+
+// eslint-disable-next-line consistent-return
+const updateUserAvatar = async (req, res) => {
+  const { avatar } = req.body;
+  const id = req.user._id;
+  try {
+    const user = await User.findByIdAndUpdate(id, { avatar }, { new: true });
+    res.status(200).send(user);
+  } catch (errors) {
+    if (errors.name.name === "ValidatorError") {
+      return res
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные пользователя" });
+    }
+    if (errors.name === "CastError") {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Пользователь не найден" });
+    }
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
+  updateUser,
+  updateUserAvatar,
 };
