@@ -21,7 +21,7 @@ const createCard = async (req, res) => {
     const card = await Card.create({ name, link, owner });
     res.status(200).send(card);
   } catch (errors) {
-    if (errors.name.name === "ValidatorError") {
+    if (errors.name === "ValidationError") {
       return res
         .status(BAD_REQUEST_ERROR)
         .send({ message: "Некорректные данные карточки" });

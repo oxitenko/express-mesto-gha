@@ -19,12 +19,17 @@ const getUserById = async (req, res) => {
   const { userId } = req.params;
   try {
     const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(NOT_FOUND_ERROR)
+        .send({ message: "Пользователь не найден" });
+    }
     res.status(200).send(user);
   } catch (errors) {
     if (errors.name === "CastError") {
       return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: "Пользователь не найден" });
+        .status(BAD_REQUEST_ERROR)
+        .send({ message: "Некорректные данные пользователя" });
     }
     res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
@@ -37,7 +42,7 @@ const createUser = async (req, res) => {
     const user = await User.create({ name, about, avatar });
     res.status(200).send(user);
   } catch (errors) {
-    if (errors.name.name === "ValidatorError") {
+    if (errors.name === "ValidationError") {
       return res
         .status(BAD_REQUEST_ERROR)
         .send({ message: "Некорректные данные пользователя" });
@@ -58,7 +63,7 @@ const updateUser = async (req, res) => {
     );
     res.status(200).send(user);
   } catch (errors) {
-    if (errors.name.name === "ValidatorError") {
+    if (errors.name === "ValidationError") {
       return res
         .status(BAD_REQUEST_ERROR)
         .send({ message: "Некорректные данные пользователя" });
@@ -80,7 +85,7 @@ const updateUserAvatar = async (req, res) => {
     const user = await User.findByIdAndUpdate(id, { avatar }, { new: true });
     res.status(200).send(user);
   } catch (errors) {
-    if (errors.name.name === "ValidatorError") {
+    if (errors.name === "ValidationError") {
       return res
         .status(BAD_REQUEST_ERROR)
         .send({ message: "Некорректные данные пользователя" });
