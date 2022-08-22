@@ -53,7 +53,7 @@ const likeCard = async (req, res) => {
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: req.user._id } },
-      { new: true }
+      { new: true, runValidators: true }
     );
     res.status(200).send(card);
   } catch (errors) {
@@ -73,7 +73,7 @@ const dislikeCard = async (req, res) => {
     const card = await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: req.user._id } },
-      { new: true }
+      { new: true, runValidators: true }
     );
     res.status(200).send(card);
   } catch (errors) {
