@@ -7,6 +7,7 @@ const { UserRoutes } = require("./routes/users");
 const { CardRoutes } = require("./routes/cards");
 
 const NOT_FOUND_ERROR = 404;
+const DEFAULT_ERROR = 500;
 
 app.use((req, res, next) => {
   req.user = {
@@ -20,7 +21,7 @@ app.use(UserRoutes);
 
 app.use(CardRoutes);
 
-app.patch("/404", (req, res) => {
+app.patch("*", (req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: "Страница не найдена" });
 });
 
@@ -33,7 +34,7 @@ async function main(req, res) {
 
     await app.listen(PORT);
   } catch (error) {
-    res.status(NOT_FOUND_ERROR).send({ message: "Страница не найдена" });
+    res.status(DEFAULT_ERROR).send({ message: "Ошибка на сервере" });
   }
 }
 
