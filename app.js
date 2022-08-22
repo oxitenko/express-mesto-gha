@@ -20,6 +20,10 @@ app.use(UserRoutes);
 
 app.use(CardRoutes);
 
+app.patch("/404", (req, res) => {
+  res.status(NOT_FOUND_ERROR).send({ message: "Страница не найдена" });
+});
+
 async function main(req, res) {
   try {
     await mongoose.connect("mongodb://localhost:27017/mestodb", {
