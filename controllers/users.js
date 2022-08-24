@@ -59,8 +59,8 @@ const updateUser = async (req, res) => {
     );
     if (!user) {
       return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: 'Некорректные данные пользователя' });
+        .status(NOT_FOUND_ERROR)
+        .send({ message: 'Пользователь не найден' });
     }
     return res.status(200).send(user);
   } catch (errors) {
@@ -84,8 +84,8 @@ const updateUserAvatar = async (req, res) => {
     );
     if (!user) {
       return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: 'Некорректные данные пользователя' });
+        .status(NOT_FOUND_ERROR)
+        .send({ message: 'Пользователь не найден' });
     }
     return res.status(200).send(user);
   } catch (errors) {
