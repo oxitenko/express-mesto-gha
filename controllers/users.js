@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/users');
 
 const DEFAULT_ERROR = 500;
@@ -34,9 +35,14 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
   try {
-    const user = await User.create({ name, about, avatar });
+    const hash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name, about, avatar, email, password: hash,
+    });
     return res.status(200).send(user);
   } catch (errors) {
     if (errors.name === 'ValidationError') {
@@ -98,10 +104,25 @@ const updateUserAvatar = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!user || !validPassword) {
+      return res.status(401).send({ message: 'Неправильные почта или пароль' });
+    } return res.status(200).send(user);
+  } catch (errors) {
+    return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
   createUser,
   updateUser,
   updateUserAvatar,
+  login,
 };

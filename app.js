@@ -6,6 +6,7 @@ const app = express();
 
 const { UserRoutes } = require('./routes/users');
 const { CardRoutes } = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
 
 const NOT_FOUND_ERROR = 404;
 const DEFAULT_ERROR = 500;
@@ -23,6 +24,9 @@ app.use((req, res, next) => {
 app.use(UserRoutes);
 
 app.use(CardRoutes);
+
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use('*', (req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });
