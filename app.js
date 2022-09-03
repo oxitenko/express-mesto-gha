@@ -4,29 +4,25 @@ const mongoose = require('mongoose');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+const cookieParser = require('cookie-parser');
 const { UserRoutes } = require('./routes/users');
 const { CardRoutes } = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const NOT_FOUND_ERROR = 404;
 const DEFAULT_ERROR = 500;
-
 app.use(express.json());
+app.use(cookieParser());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '63023f63b35df8b746b4b228',
-  };
+app.post('/signin', login);
+app.post('/signup', createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use(UserRoutes);
 
 app.use(CardRoutes);
-
-app.post('/signin', login);
-app.post('/signup', createUser);
 
 app.use('*', (req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });

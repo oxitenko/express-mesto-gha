@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 
 const DEFAULT_ERROR = 500;
@@ -108,11 +109,25 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!user || !validPassword) {
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
       return res.status(401).send({ message: 'Неправильные почта или пароль' });
-    } return res.status(200).send(user);
+    }
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).send({ message: 'Неправильные почта или пароль' });
+    }
+
+    const token = jwt.sign(
+      { _id: user._id },
+      'SECRETCODE',
+      { expiresIn: '7d' },
+    );
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      sameSite: true,
+    });
+    return res.status(200).send(user);
   } catch (errors) {
     return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
   }
