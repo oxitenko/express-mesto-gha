@@ -1,59 +1,53 @@
 const Card = require('../models/cards');
+const ServerError = require('../errors/ServerError');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
-const DEFAULT_ERROR = 500;
-const NOT_FOUND_ERROR = 404;
-const BAD_REQUEST_ERROR = 400;
-
-const getCards = async (req, res) => {
+const getCards = async (req, res, next) => {
   try {
     const card = await Card.find({});
     return res.status(200).send(card);
-  } catch (error) {
-    return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
+  } catch (err) {
+    return next(new ServerError('Ошибка на сервере'));
   }
 };
 
-const createCard = async (req, res) => {
+const createCard = async (req, res, next) => {
   const owner = req.user._id;
   const { name, link } = req.body;
   try {
     const card = await Card.create({ name, link, owner });
     return res.status(200).send(card);
-  } catch (errors) {
-    if (errors.name === 'ValidationError') {
-      return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: 'Некорректные данные карточки' });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return next(new BadRequestError('Некорректные данные карточки'));
     }
-    return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
+    return next(new ServerError('Ошибка на сервере'));
   }
 };
 
-const deleteCardById = async (req, res) => {
+const deleteCardById = async (req, res, next) => {
   const { cardId } = req.params;
   const id = req.user._id;
   try {
     const card = await Card.findByIdAndDelete(cardId);
     if (!card) {
-      return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: 'Такой карточки нет' });
+      return next(new NotFoundError('Такой карточки нет'));
     }
     if (id !== card.owner.toString()) {
-      return res.status(403).send({ message: 'Не твоя карточка' });
+      return next(new ForbiddenError('Не твоя карточка'));
     }
     return res.status(200).send(card);
-  } catch (errors) {
-    if (errors.name === 'CastError') {
-      return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: 'Некорректные данные запроса' });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Некорректные данные запроса'));
     }
-    return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
+    return next(new ServerError('Ошибка на сервере'));
   }
 };
 
-const likeCard = async (req, res) => {
+const likeCard = async (req, res, next) => {
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndUpdate(
@@ -62,22 +56,18 @@ const likeCard = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!card) {
-      return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: 'Такой карточки нет' });
+      return next(new NotFoundError('Такой карточки нет'));
     }
     return res.status(200).send(card);
   } catch (errors) {
     if (errors.name === 'CastError') {
-      return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: 'Некорректные данные запроса' });
+      return next(new BadRequestError('Некорректные данные запроса'));
     }
-    return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
+    return next(new ServerError('Ошибка на сервере'));
   }
 };
 
-const dislikeCard = async (req, res) => {
+const dislikeCard = async (req, res, next) => {
   const { cardId } = req.params;
   try {
     const card = await Card.findByIdAndUpdate(
@@ -86,18 +76,14 @@ const dislikeCard = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!card) {
-      return res
-        .status(NOT_FOUND_ERROR)
-        .send({ message: 'Такой карточки нет' });
+      return next(new NotFoundError('Такой карточки нет'));
     }
     return res.status(200).send(card);
   } catch (errors) {
     if (errors.name === 'CastError') {
-      return res
-        .status(BAD_REQUEST_ERROR)
-        .send({ message: 'Некорректные данные запроса' });
+      return next(new BadRequestError('Некорректные данные запроса'));
     }
-    return res.status(DEFAULT_ERROR).send({ message: 'Ошибка на сервере' });
+    return next(new ServerError('Ошибка на сервере'));
   }
 };
 

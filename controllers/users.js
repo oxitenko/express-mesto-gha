@@ -5,6 +5,7 @@ const ServerError = require('../errors/ServerError');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const AuthError = require('../errors/AuthError');
+const ConflictError = require('../errors/ConflictError');
 
 const getUsers = async (req, res, next) => {
   try {
@@ -57,6 +58,9 @@ const createUser = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       return next(new BadRequestError('Некорректные данные пользователя'));
+    }
+    if (err.code === 11000) {
+      return next(new ConflictError('Пользователь с таким email уже существует'));
     }
     return next(new ServerError('Ошибка на сервере'));
   }
