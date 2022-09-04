@@ -5,7 +5,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 const cookieParser = require('cookie-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const { UserRoutes } = require('./routes/users');
 const { CardRoutes } = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
@@ -37,6 +37,8 @@ app.use(CardRoutes);
 app.use('*', (req, res) => {
   res.status(NOT_FOUND_ERROR).send({ message: 'Страница не найдена' });
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
