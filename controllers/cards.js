@@ -31,12 +31,16 @@ const createCard = async (req, res) => {
 
 const deleteCardById = async (req, res) => {
   const { cardId } = req.params;
+  const id = req.user._id;
   try {
     const card = await Card.findByIdAndDelete(cardId);
     if (!card) {
       return res
         .status(NOT_FOUND_ERROR)
         .send({ message: 'Такой карточки нет' });
+    }
+    if (id !== card.owner.toString()) {
+      return res.status(403).send({ message: 'Не твоя карточка' });
     }
     return res.status(200).send(card);
   } catch (errors) {
